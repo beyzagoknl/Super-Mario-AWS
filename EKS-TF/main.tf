@@ -31,7 +31,13 @@ data "aws_subnets" "public" {
     name   = "vpc-id"
     values = [data.aws_vpc.default.id]
   }
+
+  filter {
+    name   = "tag:Name"
+    values = ["public-us-east-1a", "public-us-east-1b", "public-us-east-1c", "public-us-east-1d", "public-us-east-1f"]
+  }
 }
+
 #cluster provision
 resource "aws_eks_cluster" "example" {
   name     = "EKS_CLOUD"
