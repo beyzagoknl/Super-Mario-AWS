@@ -30,12 +30,9 @@ data "aws_vpc" "selected" {
 }
 
 #get public subnets for cluster
-data "aws_subnets" "public" {
+data "aws_subnet_ids" "public" {
   vpc_id = data.aws_vpc.selected.id
   
-  tags = {
-    Tier = "public"
-  }
 }
 
 #cluster provision
