@@ -1,30 +1,24 @@
-# IAM policy for EKS to assume role
 data "aws_iam_policy_document" "assume_role" {
   statement {
     effect = "Allow"
-
     principals {
       type        = "Service"
       identifiers = ["eks.amazonaws.com"]
     }
-
     actions = ["sts:AssumeRole"]
   }
 }
 
-# IAM role for EKS Cluster
 resource "aws_iam_role" "example" {
   name               = "eks-cluster-cloud"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
-# Attach AWS managed policies to the EKS Cluster role
 resource "aws_iam_role_policy_attachment" "example-AmazonEKSClusterPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
   role       = aws_iam_role.example.name
 }
 
-# Get specific VPC data by name
 data "aws_vpc" "selected" {
   filter {
     name   = "tag:Name"
@@ -32,12 +26,10 @@ data "aws_vpc" "selected" {
   }
 }
 
-# Get public subnets for cluster within the specific VPC
 data "aws_subnet_ids" "public" {
   vpc_id = data.aws_vpc.selected.id
 }
 
-# EKS Cluster configuration
 resource "aws_eks_cluster" "example" {
   name     = "EKS_CLOUD"
   role_arn = aws_iam_role.example.arn
@@ -51,23 +43,19 @@ resource "aws_eks_cluster" "example" {
   ]
 }
 
-# IAM role for EKS Node Group
 resource "aws_iam_role" "example1" {
   name = "eks-node-group-cloud"
 
   assume_role_policy = jsonencode({
     Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "ec2.amazonaws.com"
-      }
-    }]
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = {Service = "ec2.amazonaws.com"}
+    }],
     Version = "2012-10-17"
   })
 }
 
-# Attach AWS managed policies to the EKS Node Group role
 resource "aws_iam_role_policy_attachment" "example-AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
   role       = aws_iam_role.example1.name
@@ -83,7 +71,6 @@ resource "aws_iam_role_policy_attachment" "example-AmazonEC2ContainerRegistryRea
   role       = aws_iam_role.example1.name
 }
 
-# EKS Node Group configuration
 resource "aws_eks_node_group" "example" {
   cluster_name    = aws_eks_cluster.example.name
   node_group_name = "Node-cloud"
@@ -95,6 +82,7 @@ resource "aws_eks_node_group" "example" {
     max_size     = 2
     min_size     = 1
   }
+  
   instance_types = ["t2.medium"]
 
   depends_on = [
@@ -104,7 +92,6 @@ resource "aws_eks_node_group" "example" {
   ]
 }
 
-# Outputs
 output "cluster_name" {
   value = aws_eks_cluster.example.name
 }
