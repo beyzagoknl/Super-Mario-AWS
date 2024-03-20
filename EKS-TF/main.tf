@@ -1,9 +1,3 @@
-# Define the provider
-provider "aws" {
-  # Define your AWS region here
-  region = "us-east-1"
-}
-
 # IAM policy for EKS to assume role
 data "aws_iam_policy_document" "assume_role" {
   statement {
