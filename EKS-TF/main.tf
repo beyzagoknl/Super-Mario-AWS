@@ -33,7 +33,7 @@ data "aws_vpc" "selected" {
 }
 
 # Get public subnets for cluster within the specific VPC
-data "aws_subnets_ids" "public" {
+data "aws_subnet_ids" "public" {
   vpc_id = data.aws_vpc.selected.id
 }
 
